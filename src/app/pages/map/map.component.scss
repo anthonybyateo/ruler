@@ -1,4 +1,11 @@
-.map {
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+#map {
   &:hover {
     background-color: aquamarine;
   }

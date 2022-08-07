@@ -12,11 +12,11 @@ export class MapComponent implements OnInit, AfterViewInit {
 
   public context: CanvasRenderingContext2D | null;
 
-  public mouse = {x:0, y:0, overPath: null};
+  public mouse = {x: 0, y: 0, overPath: null};
 
   public styles = {
-    default: {fillStyle: "#0C0", strokeStyle: "#F00", lineWidth: 4},
-    over: {fillStyle: "#C008", strokeStyle: "#F0F8", lineWidth: 10},
+    default: {fillStyle: "#0C0", strokeStyle: "#F00", lineWidth: 1},
+    over: {fillStyle: "#C008", strokeStyle: "#F0F8", lineWidth: 1},
   };
 
   constructor() {
@@ -28,21 +28,11 @@ export class MapComponent implements OnInit, AfterViewInit {
   public ngAfterViewInit(): void {
     this.context = this.canvas.nativeElement.getContext('2d');
     const paths = [
-      [100, 50, 350, 50, 500, 45, 500, 80, 350, 85, 100, 80],
-      [100, 150, 350, 150, 500, 145, 500, 180, 350, 185, 100, 180],
+      [10, 10, 500, 10, 500, 100, 100, 200, 10, 100],
+      [500, 100, 100, 200, 10, 300],
     ].map(this.createPath);
-    if (this.context) {
-      this.context.fillStyle = '#f00';
-      this.context.beginPath();
-      this.context.moveTo(0, 0);
-      this.context.lineTo(100, 50);
-      this.context.lineTo(50, 100);
-      this.context.lineTo(0, 90);
-      this.context.closePath();
-      this.context.fill();
-    }
 
-
+    paths.forEach(path => this.drawPath(path));
 
     this.canvas.nativeElement.addEventListener("mousemove", (e) => {
       this.mouse.x = e.offsetX;
@@ -54,16 +44,18 @@ export class MapComponent implements OnInit, AfterViewInit {
 
   public checkMouseOver(paths: any) {
     var over;
-    for(const p of paths) { this.context?.isPointInPath(p, this.mouse.x, this.mouse.y) && (over = p) }
+    for (const path of paths) {
+      this.context?.isPointInPath(path, this.mouse.x, this.mouse.y) && (over = path)
+    }
     if (over !== this.mouse.overPath) {
       this.mouse.overPath = over;
       this.context?.clearRect(0, 0, 600, 200);
-      for (const p of paths) {
-        if (p === over) {
+      for (const path of paths) {
+        if (path === over) {
           console.log("checkMouseOver")
-          this.drawPath(p, this.styles.over)
+          this.drawPath(path, this.styles.over)
         } else {
-          this.drawPath(p)
+          this.drawPath(path)
         }
       }
     }
@@ -75,11 +67,14 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.context?.stroke(path);
   }
 
-  public createPath(path: any) {
-    let i = 0, p = new Path2D;
-    while (i < path.length) { p.lineTo(path[i++], path[i++]) }
-    p.closePath();
-    return p;
+  public createPath(path: any): Path2D {
+    const path2D = new Path2D;
+    let i = 0;
+    while (i < path.length) {
+      path2D.lineTo(path[i++], path[i++])
+    }
+    path2D.closePath();
+    return path2D;
   }
 
 }
